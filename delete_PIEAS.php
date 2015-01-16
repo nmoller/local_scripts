@@ -98,19 +98,21 @@ function delete_section_restriction_on_piea($c_sec_ob){
 
 function clear_restrictions_hw($course_id){
     global $DB;
-    $section = $DB->get_record('course_sections', array('course'=>$course_id, 'section'=>2));
-    $section = hide_section_piea($section);
-    $DB->update_record('course_sections',$section);
+    $section2 = $DB->get_record('course_sections', array('course'=>$course_id, 'section'=>2));
+    $section2 = hide_section_piea($section2);
+    $DB->update_record('course_sections',$section2);
 
-    $section = $DB->get_record('course_sections', array('course'=>$course_id, 'section'=>4));
-    $section = delete_section_restriction_on_piea($section);
-    $DB->update_record('course_sections',$section);
+    $section4 = $DB->get_record('course_sections', array('course'=>$course_id, 'section'=>4));
+    $section4 = delete_section_restriction_on_piea($section4);
+    $DB->update_record('course_sections',$section4);
 }
 ///////////////////***********************************///////////////////////////
 $pieas = get_course_piea_ids();
+echo 'Cours ids: ';
 foreach ($pieas as $cp){
-    delete_piea_by_cmid(get_piea_cmid($cp[0][0], $cp[0][1]));
-    clear_restrictions_hw($cp[0][0]);
+    echo $cp[0].'|';
+    delete_piea_by_cmid(get_piea_cmid($cp[0], $cp[1]));
+    clear_restrictions_hw($cp[0]);
 }
 
 exit(0);
