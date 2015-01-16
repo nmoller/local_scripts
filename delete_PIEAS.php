@@ -78,11 +78,39 @@ function get_piea_cmid($course_id, $instance_id){
     $cm_id_arr= $DB->get_field('course_modules','id', array('module'=>16, 'course'=>$course_id, 'instance'=>$instance_id) );
 
     return (int) $cm_id_arr;
-
 }
 
-//var_dump(get_course_ids_array());
+
+function hide_section_piea($c_sec_ob){
+    if (isset($c_sec_ob->visible)) $c_sec_ob->visible = 0;
+    return $c_sec_ob;
+}
+
+/**
+ * J'assume que c'est la seule condition que l'on a mis sur la section des devoirs....
+ * @param $c_sec_ob
+ * @return mixed
+ */
+function delete_section_restriction_on_piea($c_sec_ob){
+    if (isset($c_sec_ob->availability)) $c_sec_ob->availability = NULL;
+    return $c_sec_ob;
+}
+
+function clear_restrictions_hw($course_id){
+    global $DB;
+    $section = $DB->get_record('course_sections', array('course'=>$course_id, 'section'=>2));
+    $section = hide_section_piea($section);
+    $DB->update_record('course_sections',$section);
+
+    $section = $DB->get_record('course_sections', array('course'=>$course_id, 'section'=>4));
+    $section = delete_section_restriction_on_piea($section);
+    $DB->update_record('course_sections',$section);
+}
+///////////////////***********************************///////////////////////////
 $pieas = get_course_piea_ids();
-echo get_piea_cmid($pieas[0][0], $pieas[0][1]);
+foreach ($pieas as $cp){
+    delete_piea_by_cmid(get_piea_cmid($cp[0][0], $cp[0][1]));
+    clear_restrictions_hw($cp[0][0]);
+}
 
 exit(0);
