@@ -83,7 +83,9 @@ class Helpers{
         $mf->userid = 2;
         //TODO: Validate!
         $mf->filesize = 1188;
+        $mf->mimetype = "application/xml";
         $mf->status = 0;
+        $mf->source = $repository_file_path;
         $mf->timecreated = time();
         $mf->timemodified = time();
         $mf->sortorder = 0;
@@ -161,6 +163,6 @@ $test = new hp($DB);
 //echo $test->create_manifest_reference("cours1/imsmanifest.xml");
 //echo $test->get_root_path("cours1/imsmanifest.xml");
 
-$test->create_manifest_link("/1147/mod_scorm/package/0/imsmanifest.xml","cours1/imsmanifest.xml" );
+$test->create_manifest_link("/4462/mod_scorm/package/0/imsmanifest.xml","cours1/imsmanifest.xml" );
 
 
