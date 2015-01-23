@@ -7,39 +7,45 @@
  */
 
 namespace Cad\Scripts;
-
-/* Construire ce dont on a besoin pour le scorm */
-//obtenir le referencehash (on commence au premier niveau dans le dossier du repository)
-//echo sha1("cours_1/imsmanifest.xml");
-
-//Pour le fichier il faut avoir le pathnamehash (voir contenthash pour ça...tout le temps pareil)
-//echo sha1("/4460/mod_scorm/package/0/.");
-//ça prend un contenthash qui existe......
-
-//ça prend un contenthash qui existe......pas le vrai.. n'importe quel.
-//echo sha1_file("C:/www/moodledata/26/repository/scorm/cours_1/imsmanifest.xml");
-//avoir le pathnamehash
-//echo sha1("/4460/mod_scorm/package/0/imsmanifest.xml");
-//avoir le filesize
-//echo filesize("C:/www/moodledata/26/repository/scorm/cours_1/imsmanifest.xml");
-
-
-//Si l'on l'appelle comme scrip par ligne de commande:
+//TODO: révoir selon l'emplacement final.
 define('CLI_SCRIPT', true);
-
 require_once __DIR__."/../../../../../config.php";
+
+
+/**
+ * Class Helpers
+ * @package Cad\Scripts
+ *
+ * Usage:
+ * L'importation d'un package SCORM va produire un message d'erreur du type
+ * /1147/mod_scorm/package/0/imsmanifest.xml (420104FD-60-03/M1/M1 intro/imsmanifest.xml)
+ *
+ * Ce sont les deux paramètres dont on a besoin pour faire la création du  lien vers le fichier manifest.
+ * Code nécessaire :
+ * <pre>
+ * <code class="php">
+ * use Cad\Scripts\Helpers as hp;
+ * global $DB;
+ * $test = new hp($DB, '[repository_name]');
+ * $test->create_manifest_link("/4462/mod_scorm/package/0/imsmanifest.xml","cours1/imsmanifest.xml" );
+ * </code>
+ * </pre>
+ *
+ */
 class Helpers{
 
     private $db;
-    //Pour éviter une requête.
+    private $repository_name;
+    //sha1("") = EMPTY_HASH
     const EMPTY_HASH = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
     /**
      * @param \moodle_database $DB
      * Un peu de DI pour rendre le code testable :)
      */
-    public function __construct(\moodle_database $DB){
+    public function __construct(\moodle_database $DB, $repository_name='scorm'){
         $this->db = $DB;
+        $this->repository_name = $repository_name;
     }
 
     /**
@@ -66,6 +72,7 @@ class Helpers{
         $rf->timemodified = time();
         $rf->sortorder = 0;
 
+        $transaction = $this->db->start_delegated_transaction();
         $this->db->insert_record('files', $rf);
         //créer la référence au manifest
         $ref_id = $this->create_manifest_reference($repository_file_path);
@@ -82,7 +89,7 @@ class Helpers{
         $mf->filename = $mf_parts[5];
         $mf->userid = 2;
         //TODO: Validate!
-        $mf->filesize = 1188;
+        $mf->filesize = 777;
         $mf->mimetype = "application/xml";
         $mf->status = 0;
         $mf->source = $repository_file_path;
@@ -92,6 +99,7 @@ class Helpers{
         $mf->referencefileid = $ref_id;
 
         $this->db->insert_record('files', $mf);
+        $this->db->commit_delegated_transaction($transaction);
     }
 
     /**
@@ -109,12 +117,12 @@ class Helpers{
      * TODO: mettre le bon nom du repository
      * @return mixed
      */
-    public function get_repository($name="scorm"){
+    public function get_repository(){
         $query = "SELECT i.*, r.type AS repositorytype, r.sortorder, r.visible
                   FROM {repository} r, {repository_instances} i
                  WHERE i.typeid = r.id and i.name = ? and r.type='filesystem' ";
 
-        return $this->db->get_record_sql($query, array($name));
+        return $this->db->get_record_sql($query, array($this->repository_name));
     }
 
     /**
@@ -145,6 +153,11 @@ class Helpers{
 
     }
 
+    /**
+     * Path pour .
+     * @param $moodle_file_system_path
+     * @return mixed
+     */
     public function get_root_path($moodle_file_system_path){
         if (substr_count($moodle_file_system_path, 'imsmanifest.xml') ==0){
             die();
@@ -154,6 +167,8 @@ class Helpers{
     }
 }
 
+//TODO: Commenter si l'on l'utilise ailleurs...
+
 use Cad\Scripts\Helpers as hp;
 global $DB;
 
@@ -162,7 +177,7 @@ $test = new hp($DB);
 //var_dump($test->get_repository());
 //echo $test->create_manifest_reference("cours1/imsmanifest.xml");
 //echo $test->get_root_path("cours1/imsmanifest.xml");
-
-$test->create_manifest_link("/4462/mod_scorm/package/0/imsmanifest.xml","cours1/imsmanifest.xml" );
+## /4464/mod_scorm/package/0/imsmanifest.xml (420104FD-60-03/M1/M1 intro/imsmanifest.xml)
+$test->create_manifest_link("/4464/mod_scorm/package/0/imsmanifest.xml","cours2/M1/M1 intro/imsmanifest.xml" );
 
 
