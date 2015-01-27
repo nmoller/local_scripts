@@ -27,6 +27,9 @@ $string['path'] = 'Message from scorm import process';
 $string['pathrepository'] = 'Path in the repository';
 $string['create'] = 'Link imsmanifest';
 $string['cadscripts'] = 'Cad admin scripts. (Beta)';
-$string['nomanifest'] = '<div style="color:red" >The paths dont point to a imsmanifest.xml file!</div>';
+$string['nomanifest'] = '<div class="alert alert-error" >The paths dont point to a imsmanifest.xml file!</div>';
 $string['reponame'] = 'Repository Name';
 $string['reponamemessage'] = 'Enter the name of the filesystem repository where you have unpackaged the scorm';
+
+$string['manifestcreatedok'] = '<div class="alert alert-success" >OK {$a->file1} | {$a->file2}</div>';
+$string['manifestcreationissue'] = '<div class="alert alert-error" >Error {$a->file1} | {$a->file2}</div>';

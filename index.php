@@ -54,8 +54,8 @@ echo html_writer::tag('h2', get_string('cadscripts', 'local_scripts'));
 if (isset($path) && $path!='') {
     $error = false;
     $vars = explode('(', trim($path));
-    $path = $vars[0];
-    $pathrepository =substr_replace($vars[1], '',-1);
+    $path = (isset($vars[0])?$vars[0]:'');
+    $pathrepository = (isset($vars[1])?substr_replace($vars[1], '',-1):'');
     if ($path) {
         $error = false;
         // Valider que le lien pointe vers un manifest.
@@ -76,7 +76,6 @@ if (isset($path) && $path!='') {
         }
         else $test = new hp($DB);
 
-
         try {
         $res = $test->create_manifest_link($path, $pathrepository);
         }
@@ -84,8 +83,11 @@ if (isset($path) && $path!='') {
             $res = false;
         }
         //redirect(new moodle_url('/local/scripts/', array()));
-        if ($res) echo("OK :". $path.' | '.$pathrepository);
-        else echo("FAILED :". $path.' | '.$pathrepository);
+        $files = new \stdClass();
+        $files->file1 = $path;
+        $files->file2 = $pathrepository;
+        if ($res) echo(get_string('manifestcreatedok', 'local_scripts', $files));
+        else  echo(get_string('manifestcreationissue', 'local_scripts', $files));
     }
     else {
         echo get_string('nomanifest', 'local_scripts');
