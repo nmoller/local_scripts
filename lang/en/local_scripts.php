@@ -28,3 +28,5 @@ $string['pathrepository'] = 'Path in the repository';
 $string['create'] = 'Link imsmanifest';
 $string['cadscripts'] = 'Cad admin scripts. (Beta)';
 $string['nomanifest'] = '<div style="color:red" >The paths dont point to a imsmanifest.xml file!</div>';
+$string['reponame'] = 'Repository Name';
+$string['reponamemessage'] = 'Enter the name of the filesystem repository where you have unpackaged the scorm';

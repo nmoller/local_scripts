@@ -16,9 +16,16 @@
 
 defined('MOODLE_INTERNAL') || die;
 
+
+
 if ($hassiteconfig) { // needs this condition or there is error on login page
+    $temp = new admin_settingpage('cadpathscripts', new lang_string('pluginname','local_scripts'));
+    $temp->add(new admin_setting_configtext('scormrepositoryname', new lang_string('reponame','local_scripts'),
+        new lang_string('reponamemessage','local_scripts'), '', PARAM_ALPHANUM));
+
     // J'ajoute une nouvelle branche à dev.
-    $ADMIN->add('development', new admin_category('cadscripts', new lang_string('pluginname','local_scripts')));
+    $ADMIN->add('courses', new admin_category('cadscripts', new lang_string('pluginname','local_scripts')));
+    $ADMIN->add('cadscripts', $temp);
 
     $ADMIN->add('cadscripts', new admin_externalpage('local_scripts',
         get_string('taskcreatemanifest', 'local_scripts'),

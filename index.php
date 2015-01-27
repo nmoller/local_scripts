@@ -68,9 +68,15 @@ if (isset($path) && $path!='') {
     }
     // On procède
     if (!$error) {
-        global $DB;
+        global $DB, $CFG;
         // TODO: ne pas oublier sur le serveur de mettre comme deuxième paramètre le nom du rep.
-        $test = new hp($DB);
+        $test = new \stdClass();
+        if (isset($CFG->scormrepositoryname) && $CFG->scormrepositoryname !='') {
+            $test = new hp($DB, $CFG->scormrepositoryname);
+        }
+        else $test = new hp($DB);
+
+
         try {
         $res = $test->create_manifest_link($path, $pathrepository);
         }
