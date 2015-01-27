@@ -17,7 +17,10 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($hassiteconfig) { // needs this condition or there is error on login page
-    $ADMIN->add('development', new admin_externalpage('local_scripts',
-        get_string('pluginname', 'local_scripts'),
+    // J'ajoute une nouvelle branche à dev.
+    $ADMIN->add('development', new admin_category('cadscripts', new lang_string('pluginname','local_scripts')));
+
+    $ADMIN->add('cadscripts', new admin_externalpage('local_scripts',
+        get_string('taskcreatemanifest', 'local_scripts'),
         new moodle_url('/local/scripts/index.php')));
 }
