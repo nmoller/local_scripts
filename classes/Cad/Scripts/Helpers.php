@@ -7,9 +7,9 @@
  */
 
 namespace Cad\Scripts;
-//TODO: révoir selon l'emplacement final.
-define('CLI_SCRIPT', true);
-require_once __DIR__."/../../../../../config.php";
+// TODO: révoir selon l'emplacement final.
+//define('CLI_SCRIPT', true);
+//require_once(__DIR__."/../../../../../config.php");
 
 
 /**
@@ -36,7 +36,7 @@ class Helpers{
 
     private $db;
     private $repository_name;
-    //sha1("") = EMPTY_HASH
+    // Cest le résultat de sha1("") = EMPTY_HASH.
     const EMPTY_HASH = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
 
     /**
@@ -53,7 +53,7 @@ class Helpers{
      * @param $repository_file_path    -> "420104FD-60-03/M1/M1 intro/imsmanifest.xml"
      */
     public function create_manifest_link($moodle_file_system_path, $repository_file_path){
-        //créer root dans le système de fichier
+        // Créer root dans le système de fichier.
         $root_path = $this->get_root_path($moodle_file_system_path);
         $rf_parts = explode('/', $root_path);
         $rf = new \stdClass();
@@ -64,7 +64,7 @@ class Helpers{
         $rf->filearea = $rf_parts[3];
         $rf->itemid = $rf_parts[4];
         $rf->filepath = '/';
-        $rf->filename = $rf_parts[5];
+        $rf->filename = '.';
         $rf->userid = 2;
         $rf->filesize = 0;
         $rf->status = 0;
@@ -74,9 +74,9 @@ class Helpers{
 
         $transaction = $this->db->start_delegated_transaction();
         $this->db->insert_record('files', $rf);
-        //créer la référence au manifest
+        // Créer la référence au manifest.
         $ref_id = $this->create_manifest_reference($repository_file_path);
-        //créer le lien vers manifest dans le fs
+        // Créer le lien vers manifest dans le fs.
         $mf_parts = explode('/', $moodle_file_system_path);
         $mf = new \stdClass();
         $mf->contenthash = self::EMPTY_HASH;
@@ -86,7 +86,7 @@ class Helpers{
         $mf->filearea = $mf_parts[3];
         $mf->itemid = $mf_parts[4];
         $mf->filepath = '/';
-        $mf->filename = $mf_parts[5];
+        $mf->filename = trim($mf_parts[5]);
         $mf->userid = 2;
         //TODO: Validate!
         $mf->filesize = 777;
@@ -98,8 +98,10 @@ class Helpers{
         $mf->sortorder = 0;
         $mf->referencefileid = $ref_id;
 
-        $this->db->insert_record('files', $mf);
+        $res = $this->db->insert_record('files', $mf);
         $this->db->commit_delegated_transaction($transaction);
+
+        return $res;
     }
 
     /**
@@ -107,8 +109,8 @@ class Helpers{
      * @return mixed
      */
     public function get_root_content_hash($name="imsmanifest.xml"){
-        $query = "Select contenthash from {files} where filename=? order by id DESC ";//limit 1";
-        $ret = $this->db-> get_record_sql($query, array($name),IGNORE_MULTIPLE);
+        $query = "Select contenthash from {files} where filename=? order by id DESC "; //Limit 1".;
+        $ret = $this->db-> get_record_sql($query, array($name), IGNORE_MULTIPLE);
         return $ret->contenthash;
     }
 
@@ -135,21 +137,22 @@ class Helpers{
     public function create_manifest_reference($repository_file_path){
         $repo = $this->get_repository();
 
-        $fr= new \stdClass();
+        $fr = new \stdClass();
         $fr->repositoryid = $repo->id;
         $fr->reference = $repository_file_path;
         $fr->referencehash = sha1($repository_file_path);
 
-        //returne le id de la reference dont j'ai besoin pour créer la reference dans files
+        // Returne le id de la reference dont j'ai besoin pour créer la reference dans files.
         if ($this->db->record_exists('files_reference',
-            array('repositoryid'=>$fr->repositoryid, 'referencehash'=>$fr->referencehash))) {
+            array('repositoryid' => $fr->repositoryid, 'referencehash' => $fr->referencehash))) {
 
             $ref = $this->db->get_record('files_reference',
-                array('repositoryid'=>$fr->repositoryid, 'referencehash'=>$fr->referencehash), 'id');
+                array('repositoryid' => $fr->repositoryid, 'referencehash' => $fr->referencehash), 'id');
             return $ref->id;
         }
-        else
+        else {
             return $this->db->insert_record('files_reference', $fr);
+        }
 
     }
 
@@ -169,15 +172,15 @@ class Helpers{
 
 //TODO: Commenter si l'on l'utilise ailleurs...
 
-use Cad\Scripts\Helpers as hp;
-global $DB;
+//use Cad\Scripts\Helpers as hp;
+//global $DB;
 
-$test = new hp($DB);
+//$test = new hp($DB);
 //var_dump($test->get_root_content_hash());
 //var_dump($test->get_repository());
 //echo $test->create_manifest_reference("cours1/imsmanifest.xml");
 //echo $test->get_root_path("cours1/imsmanifest.xml");
 ## /4464/mod_scorm/package/0/imsmanifest.xml (420104FD-60-03/M1/M1 intro/imsmanifest.xml)
-$test->create_manifest_link("/4464/mod_scorm/package/0/imsmanifest.xml","cours2/M1/M1 intro/imsmanifest.xml" );
+//$test->create_manifest_link("/4464/mod_scorm/package/0/imsmanifest.xml","cours2/M1/M1 intro/imsmanifest.xml" );
 
 
