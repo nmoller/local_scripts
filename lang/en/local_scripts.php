@@ -26,6 +26,7 @@ $string['taskcreatemanifest'] = 'Create imsmanifest link';
 $string['path'] = 'Message from scorm import process';
 $string['pathrepository'] = 'Path in the repository';
 $string['create'] = 'Link imsmanifest';
+$string['titlecreate'] = 'Create Link imsmanifest';
 $string['cadscripts'] = 'Cad admin scripts. (Beta)';
 $string['nomanifest'] = '<div class="alert alert-error" >The paths dont point to a imsmanifest.xml file!</div>';
 $string['reponame'] = 'Repository Name';

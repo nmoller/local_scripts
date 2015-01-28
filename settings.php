@@ -16,8 +16,6 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-
-
 if ($hassiteconfig) { // needs this condition or there is error on login page
     $temp = new admin_settingpage('cadpathscripts', new lang_string('pluginname','local_scripts'));
     $temp->add(new admin_setting_configtext('scormrepositoryname', new lang_string('reponame','local_scripts'),

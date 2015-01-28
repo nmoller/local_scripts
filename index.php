@@ -47,51 +47,66 @@ if ($data = $mform->get_data()) {
 
 echo $OUTPUT->header();
 
-echo html_writer::tag('h2', get_string('cadscripts', 'local_scripts'));
+echo html_writer::tag('h2', get_string('titlecreate', 'local_scripts'));
 
 // On s'attend à: path1 (path2) par ligne.
 // TODO: boucle pour plusieurs.
 if (isset($path) && $path!='') {
     $error = false;
-    $vars = explode('(', trim($path));
-    $path = (isset($vars[0])?$vars[0]:'');
-    $pathrepository = (isset($vars[1])?substr_replace($vars[1], '',-1):'');
-    if ($path) {
-        $error = false;
-        // Valider que le lien pointe vers un manifest.
-        if (substr_count($path, 'imsmanifest.xml') ==0){
-            $error = true;
-        }
-        if (substr_count($pathrepository, 'imsmanifest.xml') ==0){
-            $error = true;
-        }
-    }
-    // On procède
-    if (!$error) {
-        global $DB, $CFG;
-        // TODO: ne pas oublier sur le serveur de mettre comme deuxième paramètre le nom du rep.
-        $test = new \stdClass();
-        if (isset($CFG->scormrepositoryname) && $CFG->scormrepositoryname !='') {
-            $test = new hp($DB, $CFG->scormrepositoryname);
-        }
-        else $test = new hp($DB);
+    $several_files = explode(")", trim($path));
+    // Efface le dernier valeur qui est vide
+    if ($several_files[count($several_files)-1] == '')
+        unset($several_files[count($several_files)-1]);
 
-        try {
-        $res = $test->create_manifest_link($path, $pathrepository);
+    $treated_files = array();
+    foreach($several_files as $line){
+        $file = new \stdClass();
+        $vars = explode('(', trim($line));
+        $path = (isset($vars[0])?trim($vars[0]):'');
+        $pathrepository = (isset($vars[1])?trim($vars[1]):'');
+        if ($path) {
+            $error = false;
+            // Valider que le lien pointe vers un manifest.
+            if (substr_count($path, 'imsmanifest.xml') ==0){
+                $error = true;
+            }
+            if (substr_count($pathrepository, 'imsmanifest.xml') ==0){
+                $error = true;
+            }
         }
-        catch (Exception $e) {
-            $res = false;
+        // On procède
+        if (!$error) {
+            global $DB, $CFG;
+            // TODO: ne pas oublier sur le serveur de mettre comme deuxième paramètre le nom du rep.
+            $test = new \stdClass();
+            if (isset($CFG->scormrepositoryname) && $CFG->scormrepositoryname !='') {
+                $test = new hp($DB, $CFG->scormrepositoryname);
+            }
+            else $test = new hp($DB);
+
+            try {
+                $res = $test->create_manifest_link($path, $pathrepository);
+            }
+            catch (Exception $e) {
+                $res = false;
+            }
+            $file->file1 = $path;
+            $file->file2 = $pathrepository;
+            $file->message = ($res?get_string('manifestcreatedok', 'local_scripts', $file):
+                get_string('manifestcreationissue', 'local_scripts', $file));
+
         }
-        //redirect(new moodle_url('/local/scripts/', array()));
-        $files = new \stdClass();
-        $files->file1 = $path;
-        $files->file2 = $pathrepository;
-        if ($res) echo(get_string('manifestcreatedok', 'local_scripts', $files));
-        else  echo(get_string('manifestcreationissue', 'local_scripts', $files));
+        else {
+            $file->message = get_string('nomanifest', 'local_scripts');
+        }
+
+        array_push($treated_files,$file);
+
     }
-    else {
-        echo get_string('nomanifest', 'local_scripts');
-    }
+
+    // Message pour chaque élément traité
+    foreach($treated_files as $file) echo($file->message);
+
 }
 
 
