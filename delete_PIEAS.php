@@ -96,15 +96,19 @@ function delete_section_restriction_on_piea($c_sec_ob){
     return $c_sec_ob;
 }
 
+/**
+ * @param $course_id
+ *
+ */
 function clear_restrictions_hw($course_id){
     global $DB;
-    $section2 = $DB->get_record('course_sections', array('course'=>$course_id, 'section'=>2));
-    $section2 = hide_section_piea($section2);
-    $DB->update_record('course_sections',$section2);
+    $sectionPIEA = $DB->get_record('course_sections', array('course'=>$course_id, 'name'=>'Pour accéder aux évaluations'));
+    $sectionPIEA = hide_section_piea($sectionPIEA);
+    $DB->update_record('course_sections',$sectionPIEA);
 
-    $section4 = $DB->get_record('course_sections', array('course'=>$course_id, 'section'=>4));
-    $section4 = delete_section_restriction_on_piea($section4);
-    $DB->update_record('course_sections',$section4);
+    $sectionHWs = $DB->get_record('course_sections', array('course'=>$course_id, 'name'=>'Devoirs'));
+    $sectionHWs = delete_section_restriction_on_piea($sectionHWs);
+    $DB->update_record('course_sections',$sectionHWs);
 }
 ///////////////////***********************************///////////////////////////
 $pieas = get_course_piea_ids();
