@@ -24,7 +24,7 @@ class local_scripts_form extends moodleform {
         $mform->addElement('static', '', '', get_string('info', 'local_scripts'));
 
         $mform->addElement('textarea', 'path', get_string('path', 'local_scripts'), array('rows' => 5, 'cols' => 90));
-        $mform->setType('path', PARAM_PATH);
+        $mform->setType('path', PARAM_TEXT);
         $mform->addRule('path', null, 'required', null, 'client');
 
 
